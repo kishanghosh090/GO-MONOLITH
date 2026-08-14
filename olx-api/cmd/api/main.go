@@ -4,14 +4,13 @@ import (
 	"log"
 	"net/http"
 	_ "net/http/pprof"
-	"os"
 	"time"
 
 	"github.com/kishanghosh090/GO-MONOLITH/internal/config"
 )
 
 func main() {
-	config.MustLoad()
+	cfg := config.MustLoad()
 	mux := http.NewServeMux()
 
 	mux.HandleFunc("GET /healthz", func(w http.ResponseWriter, r *http.Request) {
@@ -21,7 +20,7 @@ func main() {
 	})
 
 	srv := http.Server{
-		Addr:         ":" + os.Getenv("PORT"),
+		Addr:         ":" + cfg.Port,
 		Handler:      mux,
 		ReadTimeout:  time.Second * 10,
 		WriteTimeout: time.Second * 30,
