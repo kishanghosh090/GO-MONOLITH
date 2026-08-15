@@ -3,21 +3,18 @@ package main
 import (
 	"log"
 	"net/http"
-	_ "net/http/pprof"
 	"time"
 
 	"github.com/kishanghosh090/GO-MONOLITH/internal/config"
+	"github.com/kishanghosh090/GO-MONOLITH/internal/handlers"
 )
 
 func main() {
+	// load env
 	cfg := config.MustLoad()
 	mux := http.NewServeMux()
 
-	mux.HandleFunc("GET /healthz", func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(`{"msg":"server is running fine"}`))
-	})
+	mux.HandleFunc("GET /healthz", handlers.Health)
 
 	srv := http.Server{
 		Addr:         ":" + cfg.Port,
