@@ -6,12 +6,19 @@ import (
 	"time"
 
 	"github.com/kishanghosh090/GO-MONOLITH/internal/config"
+	"github.com/kishanghosh090/GO-MONOLITH/internal/db"
 	"github.com/kishanghosh090/GO-MONOLITH/internal/handlers"
 )
 
 func main() {
 	// load env
 	cfg := config.MustLoad()
+	_, err := db.Connect(cfg.DatabaseUrl)
+	if err != nil {
+		log.Fatalf("main.db.Connect: %v", err)
+	}
+
+
 	mux := http.NewServeMux()
 
 	mux.HandleFunc("GET /healthz", handlers.Health)
