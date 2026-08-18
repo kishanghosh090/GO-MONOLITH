@@ -1,5 +1,5 @@
 CREATE TABLE listings (
-    id UUID PRIMARY KEY DEFAULT get_random_uuid(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     title TEXT NOT NULL,
     description TEXT NOT NULL,
     price BIGINT NOT NULL,
