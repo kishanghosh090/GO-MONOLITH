@@ -1,7 +1,12 @@
 package handlers
 
-import "net/http"
+import (
+	"database/sql"
+	"net/http"
+)
 
-func Listings(w http.ResponseWriter, r *http.Request) {
-	
+func Listings(db *sql.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		
+	}
 }
