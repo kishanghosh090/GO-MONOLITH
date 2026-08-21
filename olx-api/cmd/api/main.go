@@ -18,10 +18,10 @@ func main() {
 		log.Fatalf("main.db.Connect: %v", err)
 	}
 
-
 	mux := http.NewServeMux()
 
 	mux.HandleFunc("GET /healthz", handlers.Health)
+	mux.HandleFunc("GET /listings", handlers.Listings)
 
 	srv := http.Server{
 		Addr:         ":" + cfg.Port,
