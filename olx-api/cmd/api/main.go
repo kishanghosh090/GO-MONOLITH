@@ -17,12 +17,11 @@ func main() {
 	if err != nil {
 		log.Fatalf("main.db.Connect: %v", err)
 	}
-
+	lh := handlers.NewListingHandler(db)
 	mux := http.NewServeMux()
-
 	mux.HandleFunc("GET /healthz", handlers.Health)
-	mux.HandleFunc("GET /listings", handlers.Listings(db))
-	mux.HandleFunc("DELETE /listings/{id}", handlers.DeleteListing(db))
+	mux.HandleFunc("GET /listings", lh.Listings)
+	mux.HandleFunc("DELETE /listings/{id}", lh.DeleteListing)
 
 	srv := http.Server{
 		Addr:         ":" + cfg.Port,
