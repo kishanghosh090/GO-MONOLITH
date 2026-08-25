@@ -27,7 +27,7 @@ func NewListingHandler(db *sql.DB) *ListingHandler {
 	}
 }
 
-func (lh *ListingHandler) Listings(w http.ResponseWriter, r *http.Request) {
+func (lh *ListingHandler) List(w http.ResponseWriter, r *http.Request) {
 
 	rows, err := lh.db.Query(
 		`SELECT id,title, description,price , city, created_at FROM listings
@@ -61,7 +61,7 @@ func (lh *ListingHandler) Listings(w http.ResponseWriter, r *http.Request) {
 	_ = json.NewEncoder(w).Encode(listings)
 
 }
-func (lh *ListingHandler) DeleteListing(w http.ResponseWriter, r *http.Request) {
+func (lh *ListingHandler) Delete(w http.ResponseWriter, r *http.Request) {
 
 	id := r.PathValue("id")
 	fmt.Println(id)
