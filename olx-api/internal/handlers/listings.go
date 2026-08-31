@@ -29,8 +29,11 @@ func NewListingHandler(db *sql.DB) *ListingHandler {
 
 func (lh *ListingHandler) List(w http.ResponseWriter, r *http.Request) {
 
-	rows, err := lh.db.Query(
-		`SELECT id,title, description,price , city, created_at FROM listings
+	// req scoped context
+	ctx := r.Context()
+	rows, err := lh.db.QueryContext(
+		ctx,
+		`SELECT id,title, description,price , city, created_at, pg_sleep(20) FROM listings
 			ORDER BY created_at DESC
 			LIMIT 100
 			`)
