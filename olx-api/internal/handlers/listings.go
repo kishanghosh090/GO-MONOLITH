@@ -5,10 +5,13 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"log/slog"
 	"net/http"
+	"os"
 	"time"
 )
 
+// listing strtucture
 type listing struct {
 	id          string
 	title       string
@@ -28,22 +31,25 @@ func NewListingHandler(db *sql.DB) *ListingHandler {
 }
 
 func (lh *ListingHandler) List(w http.ResponseWriter, r *http.Request) {
-
 	// req scoped context
 	ctx := r.Context()
 	rows, err := lh.db.QueryContext(
 		ctx,
 		`SELECT id,title, description,price , city, created_at, pg_sleep(20) FROM listings
-			ORDER BY created_at DESC
-			LIMIT 100
-			`)
+					ORDER BY created_at DESC
+					LIMIT 100
+				`)
+
 	if err != nil {
 		log.Printf("query: %v", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+
 	defer rows.Close()
+
 	listings := []listing{}
+
 	for rows.Next() {
 		var l listing
 		if err := rows.Scan(&l.id, &l.title, &l.description, &l.price, &l.city, &l.created_at); err != nil {
@@ -71,10 +77,11 @@ func (lh *ListingHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	_, err := lh.db.Exec(
 		`DELETE FROM listings WHERE id = $1`, id)
 	if err != nil {
-		log.Printf("delete: %w", err)
+		log.Printf("delete: %v", err)
+		log := slog.New(slog.NewJSONHandler(os.Stdout, nil))
+		slog.Error("delete failed", "listing_id", id, "err", err)
 		http.Error(w, "internal error", http.StatusInternalServerError)
 		return
 	}
 	w.WriteHeader(http.StatusNoContent)
-
 }
