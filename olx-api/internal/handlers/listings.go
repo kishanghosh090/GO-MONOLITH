@@ -3,7 +3,6 @@ package handlers
 import (
 	"database/sql"
 	"encoding/json"
-	"fmt"
 	"log"
 	"log/slog"
 	"net/http"
@@ -71,17 +70,24 @@ func (lh *ListingHandler) List(w http.ResponseWriter, r *http.Request) {
 
 }
 func (lh *ListingHandler) Delete(w http.ResponseWriter, r *http.Request) {
-
+	ctx := r.Context()
 	id := r.PathValue("id")
-	fmt.Println(id)
-	_, err := lh.db.Exec(
+
+	slog.Debug("delete failed", "listing_id", id)
+	slog.Info("starting query", "listing_id", id)
+	slog.Warn("warn log", "listing_id", id)
+
+	_, err := lh.db.ExecContext(
+		ctx,
 		`DELETE FROM listings WHERE id = $1`, id)
+
 	if err != nil {
-		log.Printf("delete: %v", err)
 		log := slog.New(slog.NewJSONHandler(os.Stdout, nil))
-		slog.Error("delete failed", "listing_id", id, "err", err)
+		log.Error("delete failed", "listing_id", id, "err", err)
 		http.Error(w, "internal error", http.StatusInternalServerError)
 		return
 	}
+
+	slog.Info("record deleted", "listing_id", id)
 	w.WriteHeader(http.StatusNoContent)
 }

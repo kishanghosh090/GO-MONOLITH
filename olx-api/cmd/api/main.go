@@ -2,7 +2,9 @@ package main
 
 import (
 	"log"
+	"log/slog"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/kishanghosh090/GO-MONOLITH/internal/config"
@@ -17,6 +19,15 @@ func main() {
 	if err != nil {
 		log.Fatalf("main.db.Connect: %v", err)
 	}
+
+	handler := slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{
+		AddSource: true,
+		Level:     slog.LevelDebug,
+	})
+
+	logger := slog.New(handler)
+	slog.SetDefault(logger)
+
 	lh := handlers.NewListingHandler(db)
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /healthz", handlers.Health)
