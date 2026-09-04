@@ -8,6 +8,8 @@ import (
 	"net/http"
 	"os"
 	"time"
+
+	"github.com/kishanghosh090/GO-MONOLITH/internal/httpx"
 )
 
 // listing strtucture
@@ -84,7 +86,7 @@ func (lh *ListingHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log := slog.New(slog.NewJSONHandler(os.Stdout, nil))
 		log.Error("delete failed", "listing_id", id, "err", err)
-		http.Error(w, "internal error", http.StatusInternalServerError)
+		httpx.Error(w, http.StatusInternalServerError, "Something went wrong", "internal_error")
 		return
 	}
 
