@@ -28,7 +28,8 @@ func main() {
 	logger := slog.New(handler)
 	slog.SetDefault(logger)
 
-	lh := handlers.NewListingHandler(db)
+	lh := handlers.NewListingHandler(db, logger)
+
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /healthz", handlers.Health)
 	mux.HandleFunc("GET /listings", lh.List)

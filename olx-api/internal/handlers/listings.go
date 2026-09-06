@@ -22,12 +22,14 @@ type listing struct {
 	created_at  time.Time
 }
 type ListingHandler struct {
-	db *sql.DB
+	db     *sql.DB
+	logger *slog.Logger
 }
 
-func NewListingHandler(db *sql.DB) *ListingHandler {
+func NewListingHandler(db *sql.DB, logger *slog.Logger) *ListingHandler {
 	return &ListingHandler{
-		db: db,
+		db:     db,
+		logger: logger,
 	}
 }
 
@@ -75,9 +77,9 @@ func (lh *ListingHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	id := r.PathValue("id")
 
-	slog.Debug("delete failed", "listing_id", id)
-	slog.Info("starting query", "listing_id", id)
-	slog.Warn("warn log", "listing_id", id)
+	lh.logger.Debug("delete failed", "listing_id", id)
+	lh.logger.Info("starting query", "listing_id", id)
+	lh.logger.Warn("warn log", "listing_id", id)
 
 	_, err := lh.db.ExecContext(
 		ctx,
