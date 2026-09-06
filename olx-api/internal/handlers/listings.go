@@ -6,7 +6,6 @@ import (
 	"log"
 	"log/slog"
 	"net/http"
-	"os"
 	"time"
 
 	"github.com/kishanghosh090/GO-MONOLITH/internal/httpx"
@@ -44,7 +43,7 @@ func (lh *ListingHandler) List(w http.ResponseWriter, r *http.Request) {
 				`)
 
 	if err != nil {
-		log.Printf("query: %v", err)
+		lh.logger.Error("listings query error", "error", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -56,10 +55,13 @@ func (lh *ListingHandler) List(w http.ResponseWriter, r *http.Request) {
 	for rows.Next() {
 		var l listing
 		if err := rows.Scan(&l.id, &l.title, &l.description, &l.price, &l.city, &l.created_at); err != nil {
-			log.Printf("Rows.Err: %v", err)
+			lh.logger.Error("rows scan error", "error", err)
 			http.Error(w, "internal error", http.StatusInternalServerError)
 			return
 		}
+
+		lh.logger.Info("listings fetched", "total", len(listings))
+
 		listings = append(listings, l)
 	}
 
@@ -77,17 +79,16 @@ func (lh *ListingHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	id := r.PathValue("id")
 
-	lh.logger.Debug("delete failed", "listing_id", id)
-	lh.logger.Info("starting query", "listing_id", id)
-	lh.logger.Warn("warn log", "listing_id", id)
+	// lh.logger.Debug("delete failed", "listing_id", id)
+	// lh.logger.Info("starting query", "listing_id", id)
+	// lh.logger.Warn("warn log", "listing_id", id)
 
 	_, err := lh.db.ExecContext(
 		ctx,
 		`DELETE FROM listings WHERE id = $1`, id)
 
 	if err != nil {
-		log := slog.New(slog.NewJSONHandler(os.Stdout, nil))
-		log.Error("delete failed", "listing_id", id, "err", err)
+		lh.logger.Error("delete query error", "error", err)
 		httpx.Error(w, http.StatusInternalServerError, "Something went wrong", "internal_error")
 		return
 	}
